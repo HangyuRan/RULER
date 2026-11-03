@@ -8,13 +8,23 @@
 
 ## Setup
 
-Python 3.10–3.12, Linux, and NVIDIA GPUs. `requirements.txt` records the original environment; install the project dependencies in your existing environment:
+Create a Python 3.12.0 environment on Linux with NVIDIA GPUs and install the dependencies:
 
 ```bash
+git clone https://github.com/HangyuRan/RULER.git
+cd RULER
+
+conda create -n ruler python=3.12.0 -y
+conda activate ruler
+
+pip install -r requirements.txt
+pip install "verl[vllm] @ git+https://github.com/volcengine/verl.git@v0.7.1"
 bash setup_environment.sh
 ```
 
 ## 1. Rubric Generation
+
+Configure an OpenAI-compatible model endpoint and generate instance-aware rubrics:
 
 ```bash
 export OPENAI_API_KEY="YOUR_API_KEY"
@@ -26,9 +36,11 @@ python rubric_generation/generate_rubrics.py \
   --output_dir outputs/icon_rubrics
 ```
 
-Generates an ideal SVG and a six-item rubric for each prompt.
+The script generates an ideal SVG and a six-item rubric for each prompt.
 
 ## 2. Training
+
+Set the vision-language model (VLM) judge endpoint, model path, and training data path:
 
 ```bash
 export VLM_ENDPOINTS="http://127.0.0.1:8000/v1"
@@ -39,9 +51,11 @@ export TRAIN_DATA_PATH="/path/to/icon.parquet"
 bash training/train_icon_grpo.sh
 ```
 
-For illustrations, use `training/train_illustration_grpo.sh`. Reward code is in `training/reward/`.
+For illustration training, use `training/train_illustration_grpo.sh`.
 
-Convert a VERL FSDP checkpoint to Hugging Face format:
+The rubric reward implementation is in `training/reward/`.
+
+To convert a VERL FSDP checkpoint to Hugging Face format, run:
 
 ```bash
 bash training/merge_checkpoint.sh \
@@ -51,6 +65,8 @@ bash training/merge_checkpoint.sh \
 
 ## 3. Inference
 
+Generate icons with a trained model:
+
 ```bash
 python inference/generate_icons.py \
   --model_path /path/to/checkpoint \
@@ -58,11 +74,11 @@ python inference/generate_icons.py \
   --output_dir outputs/icons
 ```
 
-For illustrations, use `inference/generate_illustrations.py`.
+For illustration generation, use `inference/generate_illustrations.py`.
 
 ## 4. Evaluation
 
-Offline metrics:
+Compute offline evaluation metrics:
 
 ```bash
 python evaluation/evaluate_offline_metrics.py \
@@ -70,19 +86,7 @@ python evaluation/evaluate_offline_metrics.py \
   --output-json outputs/icons/metrics.json
 ```
 
-VLM judge:
-
-```bash
-export OPENAI_API_KEY="YOUR_API_KEY"
-export OPENAI_BASE_URL="YOUR_API_BASE_URL"
-export VLM_JUDGE_MODEL="YOUR_JUDGE_MODEL"
-
-python evaluation/evaluate_with_vlm_judge.py \
-  --results-json outputs/icons/results.json \
-  --output-json outputs/icons/vlm_metrics.json
-```
-
-Individual metrics are in `evaluation/metrics/`.
+For VLM-based evaluation, use `evaluation/evaluate_with_vlm_judge.py`. Individual metric implementations are in `evaluation/metrics/`.
 
 ## Citation
 
