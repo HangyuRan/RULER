@@ -1,7 +1,3 @@
-# RULER
+# RULER Project Page
 
-Project page for **RULER: Instance-aware Rubric Rewards for SVG Generation**.
-
-[Project Page](https://hangyuran.github.io/RULER/)
-
-Code repository coming soon.
+[Project Page](https://hangyuran.github.io/RULER/) · [Code](https://github.com/HangyuRan/RULER/tree/master) · [Dataset](https://huggingface.co/datasets/hangyuran/RULER)
